@@ -15,6 +15,33 @@ internal class GraphTest {
     fun tearDown() {
     }
     @Test
+    fun neighbours(){
+        val allNodes = mutableSetOf<Node<Int>>()
+        val g = Graph<Int>()
+
+        val n = Node<Int>(1, 0.0)
+        val n2 = Node<Int>(2, 0.0)
+        val n3 = Node<Int>(3, 0.0)
+
+        g.addEdge(n, n2)
+        g.addEdge(n, n3)
+        allNodes.add(n)
+        allNodes.add(n2)
+        allNodes.add(n3)
+        val neigh  = g.neighbours(n)
+        when (neigh) {
+            is Maybe.Just -> {
+                assertTrue(neigh.value.contains(n2))
+                assertTrue(neigh.value.contains(n3))
+                assertTrue(neigh.value.size == 2)
+
+
+            }
+            else -> {}
+        }
+    }
+
+    @Test
     fun add_1_node_linked_to_2_nodes() {
         val allNodes = mutableSetOf<Node<Int>>()
         val g = Graph<Int>()
@@ -55,12 +82,6 @@ internal class GraphTest {
         assertFalse(g.adjacent(n, n3))
         assertFalse(g.adjacent(n3, n))
         assertFalse(g.adjacent(n, n4))
-
-
-
-
-
-
 
 
     }

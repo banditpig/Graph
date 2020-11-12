@@ -1,24 +1,6 @@
 import java.util.*
+import java.util.function.DoubleUnaryOperator
 import kotlin.collections.HashMap
-
-/**
- * Maybe
- *
- * @param T
- * @constructor Create empty Maybe
- */
-sealed class Maybe<out T> {
-    object None : Maybe<Nothing>()
-
-    /**
-     * Just
-     *
-     * @param T
-     * @property value
-     * @constructor Create empty Just
-     */
-    data class Just<T>(val value: T) : Maybe<T>()
-}
 
 /**
  * Node
@@ -49,6 +31,25 @@ data class Node<T>(val id: T, val weight: Double) {
 }
 
 /**
+ * Path node. Used as a wrapper of Node during path finding.
+ *
+ * @param T
+ * @property node
+ * @property value
+ * @constructor Create empty Path node
+ */
+data class PathNode<T>(val node: Node<T>, val value: Double): Comparable<PathNode<T>>{
+
+    override fun compareTo(other: PathNode<T>) = value.compareTo(other.value)
+
+}
+
+typealias Point = Pair<Int, Int>
+typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
+typealias Grid  = Graph<Node<Point>>
+
+
+/**
  * Graph of node of T (Undirected)
  *
  * @param T
@@ -58,6 +59,11 @@ class Graph<T>(){
 
     private val edges: HashMap<Node<T>, MutableCollection<Node<T>>  > = hashMapOf<Node<T>, MutableCollection<Node<T>>  >()
 
+    fun AStar(start: Node<T>, end: Node<T>, f: Heuristic<T>): Maybe<List<Node<T>>>{
+
+       return Maybe.Just(emptyList<Node<T>>())
+
+    }
     /**
      * Add edge
      *

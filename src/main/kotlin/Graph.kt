@@ -49,7 +49,7 @@ data class Node<T>(val id: T, val weight: Double) {
 }
 
 /**
- * Graph
+ * Graph of node of T (Undirected)
  *
  * @param T
  * @constructor Create empty Graph
@@ -65,13 +65,21 @@ class Graph<T>(){
      * @param to
      */
     fun addEdge(from: Node<T>, to: Node<T>){
-        when(edges.contains(from)){
-            true -> edges[from]!!.add(to)
-            false -> {
-                edges[from] =  mutableListOf<Node<T>>(to)
+
+        fun insertEdge(from: Node<T>, to: Node<T>) {
+            when (edges.contains(from)) {
+                true -> edges[from]!!.add(to)
+                false -> {
+                    edges[from] = mutableListOf(to)
+                }
             }
         }
+        //This is an undirected graph.
+        insertEdge(from, to)
+        insertEdge(to, from)
     }
+
+
 
     /**
      * Nodes
@@ -108,22 +116,4 @@ class Graph<T>(){
         }
         return Maybe.None
     }
-
-}
-
-/**
- * Main
- *
- * @param args
- */
-fun  main(args: Array<String>) {
-    val nodes = listOf<String>()
-
-
-
-    print("x")
-
-
-
-
 }

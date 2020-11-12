@@ -40,6 +40,69 @@ internal class GraphTest {
             else -> {}
         }
     }
+    @Test
+    fun make_ring() {
+
+        val g = Graph<Int>()
+
+        val n = Node<Int>(1, 0.0)
+        val n2 = Node<Int>(2, 0.0)
+        val n3 = Node<Int>(3, 0.0)
+        val n4 = Node<Int>(4, 0.0)
+        val n5 = Node<Int>(5, 0.0)
+        val allNodes = mutableSetOf<Node<Int>>(n, n2, n3, n4, n5)
+        g.addEdge(n, n2)
+        g.addEdge(n2, n3)
+        g.addEdge(n3, n4)
+        g.addEdge(n4, n5)
+        g.addEdge(n5, n)
+
+        assertTrue(g.nodes().containsAll(allNodes))
+        assertTrue(g.nodes().size == allNodes.size)
+
+        //check neigbours
+        var neigh = g.neighbours(n2)
+        when (neigh) {
+            is Maybe.Just -> {
+                assertTrue(neigh.value.contains(n))
+                assertTrue(neigh.value.contains(n3))
+                assertTrue(neigh.value.size == 2)
+            }
+            else -> {
+            }
+        }
+         neigh = g.neighbours(n3)
+        when (neigh) {
+            is Maybe.Just -> {
+                assertTrue(neigh.value.contains(n2))
+                assertTrue(neigh.value.contains(n4))
+                assertTrue(neigh.value.size == 2)
+            }
+            else -> {
+            }
+        }
+        neigh = g.neighbours(n4)
+        when (neigh) {
+            is Maybe.Just -> {
+                assertTrue(neigh.value.contains(n3))
+                assertTrue(neigh.value.contains(n5))
+                assertTrue(neigh.value.size == 2)
+            }
+            else -> {
+            }
+        }
+
+        neigh = g.neighbours(n5)
+        when (neigh) {
+            is Maybe.Just -> {
+                assertTrue(neigh.value.contains(n))
+                assertTrue(neigh.value.contains(n4))
+                assertTrue(neigh.value.size == 2)
+            }
+            else -> {
+            }
+        }
+    }
 
     @Test
     fun add_1_node_linked_to_2_nodes() {

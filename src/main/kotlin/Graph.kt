@@ -92,10 +92,59 @@ open class Graph<T>(){
 
     private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
-     fun AStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Maybe<List<Node<T>>>{
+     fun AStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
 
 
-        return Maybe.Just(emptyList<Node<T>>())
+         var cameFrom = mutableMapOf<Node<T>, Node<T>>()
+         var costSoFar =  mutableMapOf<Node<T>, Double>()
+
+         var frontier = PriorityQueue<PathNode<T>>()
+         frontier.add(PathNode(start, 0.0))
+
+         cameFrom[start] = start
+         costSoFar[start] = 0.0
+
+         while (frontier.count() > 0){
+
+             var current = frontier.remove().node
+             if(current == goal){
+
+
+                 //unpick path from cameFrom
+                 break
+             }
+
+             var ney = neighbours(current)
+             for ( next in ney){
+                 // 'cost of going from current to next'
+                 println(costToGo(current, next))
+                 val  newCost = costSoFar[current]!! + costToGo(current, next)
+                 println(costSoFar.containsKey(next))
+                 if( !costSoFar.containsKey(next) || newCost < costSoFar[next]!!){
+                     costSoFar[next] = newCost
+
+                     println("===")
+                     println(newCost)
+                     println(f(next, goal))
+                     println("---------------")
+                     val priority = newCost + f (next, goal)
+                     val newF = PathNode(next, priority)
+                     if (!frontier.contains(newF)){
+                         frontier.add(newF)
+
+                     }
+                     cameFrom[next] = current
+                 }
+
+             }
+
+         }
+        val p = mutableSetOf( cameFrom.values).flatten()
+         var path = mutableSetOf<Node<T>>()
+        cameFrom.keys.forEach(){
+            cameFrom!![it]?.let { it1 -> path.add(it1) }
+        }
+        return path
 
     }
     fun costToGo(from: Node<T>, to: Node<T>): Double{

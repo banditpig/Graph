@@ -19,7 +19,7 @@ internal class PathNodeTest {
 
     }
     @Test
-    fun queing() {
+    fun queuing() {
 
         val pn = PathNode(Node<Int>(1, 0.0), 1.0)
         val pn2 = PathNode(Node<Int>(2, 0.0), 2.0)

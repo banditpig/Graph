@@ -1,5 +1,4 @@
 import java.util.*
-import java.util.function.DoubleUnaryOperator
 import kotlin.collections.HashMap
 
 /**
@@ -10,7 +9,7 @@ import kotlin.collections.HashMap
  * @property weight
  * @constructor Create empty Node
  */
-data class Node<T>(val id: T, val weight: Double) {
+data class Node<T>(val id: T, val weight: Double = 0.0) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -42,26 +41,65 @@ data class PathNode<T>(val node: Node<T>, val value: Double): Comparable<PathNod
 
     override fun compareTo(other: PathNode<T>) = value.compareTo(other.value)
 
+
+}
+data class Point(val x: Int, val y: Int){
+     operator fun plus(o: Point): Point = Point(x + o.x, y + o.y)
+
 }
 
-typealias Point = Pair<Int, Int>
 typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
-typealias Grid  = Graph<Node<Point>>
+typealias PathCostFunction = (Point, Point) -> Double
+val fixedCostPath: PathCostFunction =  fun(_: Point, _: Point):Double = 1.0
+
+class RectGrid(private val rows: Int, private val cols: Int,f: PathCostFunction = fixedCostPath) : Graph<Point>() {
+
+    private val unitPoints = listOf<Point>(Point(1, 0), Point(0, -1), Point(-1, 0), Point(0, 1))
+    init {
+        //point for each r,c. and edges between each point and its U,D,L,R neighbours
+        //iff the neighbour is within the grid
+        for (x in 0..cols - 1){
+            for(y in 0..rows - 1){
+                val p = Point(x, y)
+                println(p);
+                println("****")
+                for(unitP in unitPoints){
+                    val neigh = p + unitP
+                    if(inBounds(neigh)){
+
+                        println(neigh)
+                        addEdge(Node(p), Node(neigh), fixedCostPath(p, neigh))
+                    }
+                }
+                println("-------------")
+            }
+        }
+    }
 
 
+    private fun inBounds(pn: Point): Boolean =  pn.x in 0..rows -1 &&  pn.y in 0..cols - 1
+
+}
 /**
  * Graph of node of T (Undirected)
  *
  * @param T
  * @constructor Create empty Graph
  */
-class Graph<T>(){
+open class Graph<T>(){
 
-    private val edges: HashMap<Node<T>, MutableCollection<Node<T>>  > = hashMapOf<Node<T>, MutableCollection<Node<T>>  >()
+    private data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
 
-    fun AStar(start: Node<T>, end: Node<T>, f: Heuristic<T>): Maybe<List<Node<T>>>{
+    private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
-       return Maybe.Just(emptyList<Node<T>>())
+     fun AStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Maybe<List<Node<T>>>{
+
+
+        return Maybe.Just(emptyList<Node<T>>())
+
+    }
+    fun costToGo(from: Node<T>, to: Node<T>): Double{
+        return  edges[from]!!.filter { it -> it.node == to }[0].weightToParent
 
     }
     /**
@@ -70,21 +108,21 @@ class Graph<T>(){
      * @param from
      * @param to
      */
-    fun addEdge(from: Node<T>, to: Node<T>){
+    fun addEdge(from: Node<T>, to: Node<T>, costFromTo: Double = 1.0){
 
-        fun insertEdge(from: Node<T>, to: Node<T>) {
-            when (edges.contains(from)) {
-                true -> edges[from]!!.add(to)
-                false -> {
-                    edges[from] = mutableListOf(to)
-                }
+        insertEdge(from, to, costFromTo)
+        //This is an undirected graph. So be explicit in that there's also and edge to-from with the same cost.
+        //A directed graph would override addEdge.
+        insertEdge(to, from, costFromTo)
+    }
+    private fun insertEdge(from: Node<T>, to: Node<T>, costFromTo: Double) {
+        when (edges.contains(from)) {
+            true -> edges[from]!!.add(WeightedEdge(to, costFromTo) )
+            false -> {
+                edges[from] = mutableSetOf (WeightedEdge(to, costFromTo))
             }
         }
-        //This is an undirected graph.
-        insertEdge(from, to)
-        insertEdge(to, from)
     }
-
 
 
     /**
@@ -93,7 +131,7 @@ class Graph<T>(){
      * @return
      */
     fun nodes() : Collection<Node<T>> {
-      return (edges.keys union edges.values.flatten()) //sets will remove dups.
+      return (edges.keys union edges.values.flatten().map { it -> it.node }) //sets will remove dups.
     }
 
     /**
@@ -104,9 +142,9 @@ class Graph<T>(){
      * @return
      */
     fun adjacent(n1: Node<T>, n2: Node<T>): Boolean{
-        return edges.containsKey(n1) && edges[n1]!!.contains(n2)
+        return edges.containsKey(n1) && edges[n1]!!.map { it -> it.node }.contains(n2)
                 ||
-               edges.containsKey(n2) && edges[n2]!!.contains(n1)
+               edges.containsKey(n2) && edges[n2]!!.map { it -> it.node }.contains(n1)
     }
 
     /**
@@ -115,11 +153,12 @@ class Graph<T>(){
      * @param n
      * @return
      */
-    fun neighbours(n: Node<T> ): Maybe<Collection<Node<T>>>{
+    fun neighbours(n: Node<T> ): Collection<Node<T>>{
 
         if(edges.containsKey(n)) {
-           return Maybe.Just(Collections.unmodifiableList(edges[n]!!.toList()))
+            val nodes = edges[n]!!.toList().map { it -> it.node }
+            return Collections.unmodifiableList(nodes)
         }
-        return Maybe.None
+        return emptyList()
     }
 }

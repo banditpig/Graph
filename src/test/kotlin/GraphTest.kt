@@ -29,16 +29,10 @@ internal class GraphTest {
         allNodes.add(n2)
         allNodes.add(n3)
         val neigh  = g.neighbours(n)
-        when (neigh) {
-            is Maybe.Just -> {
-                assertTrue(neigh.value.contains(n2))
-                assertTrue(neigh.value.contains(n3))
-                assertTrue(neigh.value.size == 2)
+        assertTrue(neigh.contains(n2))
+        assertTrue(neigh.contains(n3))
+        assertTrue(neigh.size == 2)
 
-
-            }
-            else -> {}
-        }
     }
     @Test
     fun make_ring() {
@@ -62,46 +56,23 @@ internal class GraphTest {
 
         //check neigbours
         var neigh = g.neighbours(n2)
-        when (neigh) {
-            is Maybe.Just -> {
-                assertTrue(neigh.value.contains(n))
-                assertTrue(neigh.value.contains(n3))
-                assertTrue(neigh.value.size == 2)
-            }
-            else -> {
-            }
-        }
+        assertTrue(neigh.contains(n))
+        assertTrue(neigh.contains(n3))
+        assertTrue(neigh.size == 2)
+
          neigh = g.neighbours(n3)
-        when (neigh) {
-            is Maybe.Just -> {
-                assertTrue(neigh.value.contains(n2))
-                assertTrue(neigh.value.contains(n4))
-                assertTrue(neigh.value.size == 2)
-            }
-            else -> {
-            }
-        }
+        assertTrue(neigh.contains(n2))
+        assertTrue(neigh.contains(n4))
+        assertTrue(neigh.size == 2)
+
         neigh = g.neighbours(n4)
-        when (neigh) {
-            is Maybe.Just -> {
-                assertTrue(neigh.value.contains(n3))
-                assertTrue(neigh.value.contains(n5))
-                assertTrue(neigh.value.size == 2)
-            }
-            else -> {
-            }
-        }
+        assertTrue(neigh.contains(n5))
+        assertTrue(neigh.size == 2)
 
         neigh = g.neighbours(n5)
-        when (neigh) {
-            is Maybe.Just -> {
-                assertTrue(neigh.value.contains(n))
-                assertTrue(neigh.value.contains(n4))
-                assertTrue(neigh.value.size == 2)
-            }
-            else -> {
-            }
-        }
+        assertTrue(neigh.contains(n))
+        assertTrue(neigh.contains(n4))
+        assertTrue(neigh.size == 2)
     }
 
     @Test
@@ -121,6 +92,17 @@ internal class GraphTest {
 
         assertEquals(3, g.nodes().size)
         assertEquals(allNodes, g.nodes())
+
+
+    }
+    @Test
+    fun path_cost(){
+        val g = Graph<Int>()
+        val n1 = Node<Int>(1, 0.0)
+        val n2 = Node<Int>(2, 0.0)
+        g.addEdge(n1, n2, 5.0)
+        assertEquals(g.costToGo(n1, n2), 5.0)
+        assertEquals(g.costToGo(n2, n1), 5.0)
 
 
     }

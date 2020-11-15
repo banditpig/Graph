@@ -49,35 +49,47 @@ data class Point(val x: Int, val y: Int){
 }
 
 typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
-typealias PathCostFunction = (Point, Point) -> Double
-val fixedCostPath: PathCostFunction =  fun(_: Point, _: Point):Double = 1.0
+typealias PathCostFunction<T> = (Node<T>, Node<T>) -> Double
+val fixedCostPath: PathCostFunction<Point> =  fun(_: Node<Point>, _: Node<Point>):Double = 1.0
 
-class RectGrid(private val rows: Int, private val cols: Int,f: PathCostFunction = fixedCostPath) : Graph<Point>() {
+class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunction<Point> = fixedCostPath) : Graph<Point>() {
 
-    private val unitPoints = listOf<Point>(Point(1, 0), Point(0, -1), Point(-1, 0), Point(0, 1))
+    private val unitPoints = listOf(
+            Point(1, 0), Point(0, -1), Point(-1, 0), Point(0, 1),
+            Point(-1, -1),Point(1, -1),Point(1, 1),Point(-1,1))
     init {
         //point for each r,c. and edges between each point and its U,D,L,R neighbours
         //iff the neighbour is within the grid
-        for (x in 0..cols - 1){
-            for(y in 0..rows - 1){
+        for (x in 0 until xRange){
+            for(y in 0 until yRange){
                 val p = Point(x, y)
-                println(p);
-                println("****")
+
                 for(unitP in unitPoints){
                     val neigh = p + unitP
                     if(inBounds(neigh)){
-
-                        println(neigh)
-                        addEdge(Node(p), Node(neigh), fixedCostPath(p, neigh))
+                        addEdge(Node(p), Node(neigh), f(Node(p), Node(neigh)))
                     }
                 }
-                println("-------------")
             }
         }
     }
 
+    fun printGrid(path: Collection<Node<Point>> = emptyList()){
+        println()
+        for (x in 0 until xRange){
+            for(y in 0 until yRange){
+                val pn = Node(Point(x, y))
+                if (path.contains(pn)){
+                    print(".")
+                }else {
+                    print("#")
+                }
+            }
+            println()
+        }
 
-    private fun inBounds(pn: Point): Boolean =  pn.x in 0..rows -1 &&  pn.y in 0..cols - 1
+    }
+    private fun inBounds(pn: Point): Boolean =  pn.x in 0 until xRange &&  pn.y in 0 until yRange
 
 }
 /**
@@ -86,19 +98,19 @@ class RectGrid(private val rows: Int, private val cols: Int,f: PathCostFunction 
  * @param T
  * @constructor Create empty Graph
  */
-open class Graph<T>(){
+open class Graph<T> {
 
     private data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
 
     private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
-     fun AStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
+     fun aStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
 
 
-         var cameFrom = mutableMapOf<Node<T>, Node<T>>()
-         var costSoFar =  mutableMapOf<Node<T>, Double>()
+         val cameFrom = mutableMapOf<Node<T>, Node<T>>()
+         val costSoFar =  mutableMapOf<Node<T>, Double>()
 
-         var frontier = PriorityQueue<PathNode<T>>()
+         val frontier = PriorityQueue<PathNode<T>>()
          frontier.add(PathNode(start, 0.0))
 
          cameFrom[start] = start
@@ -106,27 +118,26 @@ open class Graph<T>(){
 
          while (frontier.count() > 0){
 
-             var current = frontier.remove().node
+             val current = frontier.remove().node
              if(current == goal){
 
-
-                 //unpick path from cameFrom
-                 break
+                 tailrec fun unpick(acc: MutableList<Node<T>>,  n: Node<T>){
+                     acc.add(n)
+                     if(n == start) return
+                     unpick(acc, cameFrom.remove(n)!!)
+                 }
+                 val path =  mutableListOf(goal)
+                 val nd = cameFrom.remove(goal)
+                 unpick(path, nd!!)
+                 return path
              }
 
-             var ney = neighbours(current)
-             for ( next in ney){
+             for ( next in neighbours(current)){
                  // 'cost of going from current to next'
-                 println(costToGo(current, next))
                  val  newCost = costSoFar[current]!! + costToGo(current, next)
-                 println(costSoFar.containsKey(next))
                  if( !costSoFar.containsKey(next) || newCost < costSoFar[next]!!){
                      costSoFar[next] = newCost
 
-                     println("===")
-                     println(newCost)
-                     println(f(next, goal))
-                     println("---------------")
                      val priority = newCost + f (next, goal)
                      val newF = PathNode(next, priority)
                      if (!frontier.contains(newF)){
@@ -135,28 +146,17 @@ open class Graph<T>(){
                      }
                      cameFrom[next] = current
                  }
-
              }
-
          }
-        val p = mutableSetOf( cameFrom.values).flatten()
-         var path = mutableSetOf<Node<T>>()
-        cameFrom.keys.forEach(){
-            cameFrom!![it]?.let { it1 -> path.add(it1) }
-        }
-        return path
+
+        return emptyList()
 
     }
     fun costToGo(from: Node<T>, to: Node<T>): Double{
-        return  edges[from]!!.filter { it -> it.node == to }[0].weightToParent
+        return  edges[from]!!.filter { it.node == to }[0].weightToParent
 
     }
-    /**
-     * Add edge
-     *
-     * @param from
-     * @param to
-     */
+
     fun addEdge(from: Node<T>, to: Node<T>, costFromTo: Double = 1.0){
 
         insertEdge(from, to, costFromTo)
@@ -180,7 +180,7 @@ open class Graph<T>(){
      * @return
      */
     fun nodes() : Collection<Node<T>> {
-      return (edges.keys union edges.values.flatten().map { it -> it.node }) //sets will remove dups.
+      return (edges.keys union edges.values.flatten().map { it.node }) //sets will remove dups.
     }
 
     /**
@@ -191,9 +191,9 @@ open class Graph<T>(){
      * @return
      */
     fun adjacent(n1: Node<T>, n2: Node<T>): Boolean{
-        return edges.containsKey(n1) && edges[n1]!!.map { it -> it.node }.contains(n2)
+        return edges.containsKey(n1) && edges[n1]!!.map { it.node }.contains(n2)
                 ||
-               edges.containsKey(n2) && edges[n2]!!.map { it -> it.node }.contains(n1)
+               edges.containsKey(n2) && edges[n2]!!.map { it.node }.contains(n1)
     }
 
     /**
@@ -205,7 +205,7 @@ open class Graph<T>(){
     fun neighbours(n: Node<T> ): Collection<Node<T>>{
 
         if(edges.containsKey(n)) {
-            val nodes = edges[n]!!.toList().map { it -> it.node }
+            val nodes = edges[n]!!.toList().map { it.node }
             return Collections.unmodifiableList(nodes)
         }
         return emptyList()

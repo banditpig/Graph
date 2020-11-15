@@ -1,5 +1,6 @@
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 /**
  * Node
@@ -51,7 +52,17 @@ data class Point(val x: Int, val y: Int){
 typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
 typealias PathCostFunction<T> = (Node<T>, Node<T>) -> Double
 val fixedCostPath: PathCostFunction<Point> =  fun(_: Node<Point>, _: Node<Point>):Double = 1.0
+val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node<Point>):Double{
+    val xTo = to.id.x
+    val yTo = to.id.y
+    val xFr = frm.id.x
+    val yFr = frm.id.y
+    if (abs(xTo - xFr) > 0 && abs(yTo - yFr) >0){
+        return 20.0
+    }
 
+    return 1.0
+}
 class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunction<Point> = fixedCostPath) : Graph<Point>() {
 
     private val unitPoints = listOf(
@@ -87,6 +98,7 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
             }
             println()
         }
+        println()
 
     }
     private fun inBounds(pn: Point): Boolean =  pn.x in 0 until xRange &&  pn.y in 0 until yRange
@@ -104,7 +116,7 @@ open class Graph<T> {
 
     private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
-     fun aStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
+    fun aStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
 
 
          val cameFrom = mutableMapOf<Node<T>, Node<T>>()
@@ -116,7 +128,7 @@ open class Graph<T> {
          cameFrom[start] = start
          costSoFar[start] = 0.0
 
-         while (frontier.count() > 0){
+         while (!frontier.isEmpty()){
 
              val current = frontier.remove().node
              if(current == goal){

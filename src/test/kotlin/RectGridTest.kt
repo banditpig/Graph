@@ -2,7 +2,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
-import kotlin.math.sqrt
 
 internal class RectGridTes {
 
@@ -15,7 +14,7 @@ internal class RectGridTes {
     }
     @Test
     fun easy_path(){
-        val g = RectGrid(50,50)
+        val g = RectGrid(50,50, penaliseDiagonal)
         val st = Node(Point(0,0), 0.0)
         val en = Node(Point(49,49), 0.0)
         //typealias Heuristic<T> = (Node<T>, Node<T>) -> Double

@@ -26,7 +26,7 @@ internal class RectGridTes {
             return d.toDouble()
 
         }
-        val path = g.aStar(st, en, myF)
+        val path = aStar(g, st, en, myF)
         print(path)
         g.printGrid(path)
     }

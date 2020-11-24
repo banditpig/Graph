@@ -8,6 +8,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 dependencies {
     implementation("org.junit.jupiter:junit-jupiter:5.4.2")

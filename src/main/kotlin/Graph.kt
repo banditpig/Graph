@@ -1,6 +1,5 @@
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.math.abs
 
 /**
  * Node
@@ -41,28 +40,14 @@ data class Node<T>(val id: T, val weight: Double = 0.0) {
 data class PathNode<T>(val node: Node<T>, val value: Double): Comparable<PathNode<T>>{
 
     override fun compareTo(other: PathNode<T>) = value.compareTo(other.value)
-
-
 }
 data class Point(val x: Int, val y: Int){
      operator fun plus(o: Point): Point = Point(x + o.x, y + o.y)
 
 }
 
-typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
-typealias PathCostFunction<T> = (Node<T>, Node<T>) -> Double
-val fixedCostPath: PathCostFunction<Point> =  fun(_: Node<Point>, _: Node<Point>):Double = 1.0
-val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node<Point>):Double{
-    val xTo = to.id.x
-    val yTo = to.id.y
-    val xFr = frm.id.x
-    val yFr = frm.id.y
-    if (abs(xTo - xFr) > 0 && abs(yTo - yFr) >0){
-        return 20.0
-    }
+data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
 
-    return 1.0
-}
 class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunction<Point> = fixedCostPath) : Graph<Point>() {
 
     private val unitPoints = listOf(
@@ -112,59 +97,11 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
  */
 open class Graph<T> {
 
-    private data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
 
     private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
-    fun aStar(start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
 
-
-         val cameFrom = mutableMapOf<Node<T>, Node<T>>()
-         val costSoFar =  mutableMapOf<Node<T>, Double>()
-
-         val frontier = PriorityQueue<PathNode<T>>()
-         frontier.add(PathNode(start, 0.0))
-
-         cameFrom[start] = start
-         costSoFar[start] = 0.0
-
-         while (!frontier.isEmpty()){
-
-             val current = frontier.remove().node
-             if(current == goal){
-
-                 tailrec fun unpick(acc: MutableList<Node<T>>,  n: Node<T>){
-                     acc.add(n)
-                     if(n == start) return
-                     unpick(acc, cameFrom.remove(n)!!)
-                 }
-                 val path =  mutableListOf(goal)
-                 val nd = cameFrom.remove(goal)
-                 unpick(path, nd!!)
-                 return path
-             }
-
-             for ( next in neighbours(current)){
-                 // 'cost of going from current to next'
-                 val  newCost = costSoFar[current]!! + costToGo(current, next)
-                 if( !costSoFar.containsKey(next) || newCost < costSoFar[next]!!){
-                     costSoFar[next] = newCost
-
-                     val priority = newCost + f (next, goal)
-                     val newF = PathNode(next, priority)
-                     if (!frontier.contains(newF)){
-                         frontier.add(newF)
-
-                     }
-                     cameFrom[next] = current
-                 }
-             }
-         }
-
-        return emptyList()
-
-    }
-    fun costToGo(from: Node<T>, to: Node<T>): Double{
+        fun costToGo(from: Node<T>, to: Node<T>): Double{
         return  edges[from]!!.filter { it.node == to }[0].weightToParent
 
     }
@@ -175,6 +112,9 @@ open class Graph<T> {
         //This is an undirected graph. So be explicit in that there's also and edge to-from with the same cost.
         //A directed graph would override addEdge.
         insertEdge(to, from, costFromTo)
+    }
+    fun addEdge(from: T, to: T, costFromTo: Double = 1.0){
+        addEdge(Node(from), Node(to), costFromTo)
     }
     private fun insertEdge(from: Node<T>, to: Node<T>, costFromTo: Double) {
         when (edges.contains(from)) {
@@ -192,7 +132,15 @@ open class Graph<T> {
      * @return
      */
     fun nodes() : Collection<Node<T>> {
-      return (edges.keys union edges.values.flatten().map { it.node }) //sets will remove dups.
+      return (edges.keys union edges.values.flatten().map { it.node }) //sets will remove duplicates.
+    }
+    fun edgesFor(n: Node<T>): Collection<WeightedEdge<T>>{
+
+        if(edges.containsKey(n)){
+          return Collections.unmodifiableCollection( edges[n])
+        }
+       return emptyList()
+
     }
 
     /**

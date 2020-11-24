@@ -28,10 +28,25 @@ internal class GraphTest {
         allNodes.add(n)
         allNodes.add(n2)
         allNodes.add(n3)
-        val neigh  = g.neighbours(n)
+        var neigh  = g.neighbours(n)
         assertTrue(neigh.contains(n2))
         assertTrue(neigh.contains(n3))
         assertTrue(neigh.size == 2)
+
+        neigh = g.neighbours(n2)
+        assertTrue(neigh.contains(n))
+        assertTrue(neigh.size == 1)
+
+        neigh = g.neighbours(n3)
+        assertTrue(neigh.contains(n))
+        assertTrue(neigh.size == 1)
+
+        val n4 = Node<Int>(4, 0.0)
+        g.addEdge(n4, n3)
+        neigh = g.neighbours(n3)
+        assertTrue(neigh.size == 2)
+        assertTrue(neigh.contains(n4))
+        assertTrue(neigh.contains(n))
 
     }
     @Test
@@ -56,7 +71,7 @@ internal class GraphTest {
 
         //check neigbours
         var neigh = g.neighbours(n2)
-        assertTrue(neigh.contains(n))
+        //assertTrue(neigh.contains(n))
         assertTrue(neigh.contains(n3))
         assertTrue(neigh.size == 2)
 
@@ -108,7 +123,6 @@ internal class GraphTest {
     }
     @Test
     fun check_adjacent(){
-        val allNodes = mutableSetOf<Node<Int>>()
         val g = Graph<Int>()
         val n = Node<Int>(1, 0.0)
         val n2 = Node<Int>(2, 0.0)
@@ -149,6 +163,42 @@ internal class GraphTest {
     }
 
     @Test
-    fun nodes() {
+    fun astar(){
+
+       val h =  fun  (n1: Node<String>, _: Node<String>):Double{
+                return when (n1.id) {
+                    "A" -> 20.0
+                    "B" -> 15.0
+                    "C" -> 19.0
+                    "F" -> 17.0
+                    "E" -> 10.0
+                    "G" -> 7.0
+                    "D" -> 5.0
+                    "X" -> 0.0
+
+
+                    else -> 0.0
+                }
+        }
+        val g = Graph<String>()
+
+        g.addEdge(Node("A"), Node("B"), 2.0)
+        g.addEdge(Node("A"), Node("C"), 1.0)
+        g.addEdge(Node("A"), Node("E"), 2.0)
+        g.addEdge(Node("B"), Node("E"),1.0)
+        g.addEdge(Node("B"), Node("D"), 2.0)
+        g.addEdge(Node("C"), Node("F"), 3.0)
+        g.addEdge(Node("D"), Node("E"), 1.0)
+        g.addEdge(Node("D"), Node("X"), 1.0)
+        g.addEdge(Node("E"), Node("G"), 3.0)
+        g.addEdge(Node("E"), Node("F"), 1.0)
+        g.addEdge(Node("G"), Node("X"), 1.0)
+        g.addEdge(Node("F"), Node("G"), 2.0)
+
+        val p = aStar(g, Node("A"), Node("X"), h)
+        val pd = dijkstra(g, "A","X")
+        outputDot(g, pd)
+        println(pd)
     }
+
 }

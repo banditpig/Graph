@@ -9,7 +9,7 @@ import kotlin.collections.HashMap
  * @property weight
  * @constructor Create empty Node
  */
-data class Node<T>(val id: T, val weight: Double = 0.0) {
+data class Node<T>(val id: T, val weight: Double = 1.0) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -30,7 +30,7 @@ data class Node<T>(val id: T, val weight: Double = 0.0) {
 }
 
 /**
- * Path node. Used as a wrapper of Node during path finding.
+ * Path node
  *
  * @param T
  * @property node
@@ -41,13 +41,44 @@ data class PathNode<T>(val node: Node<T>, val value: Double): Comparable<PathNod
 
     override fun compareTo(other: PathNode<T>) = value.compareTo(other.value)
 }
+
+/**
+ * Point
+ *
+ * @property x
+ * @property y
+ * @constructor Create empty Point
+ */
 data class Point(val x: Int, val y: Int){
-     operator fun plus(o: Point): Point = Point(x + o.x, y + o.y)
+    /**
+     * Plus
+     *
+     * @param o
+     * @return
+     */
+    operator fun plus(o: Point): Point = Point(x + o.x, y + o.y)
 
 }
 
+/**
+ * Weighted edge
+ *
+ * @param T
+ * @property node
+ * @property weightToParent
+ * @constructor Create empty Weighted edge
+ */
 data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
 
+/**
+ * Rect grid
+ *
+ * @property xRange
+ * @property yRange
+ * @constructor
+ *
+ * @param f
+ */
 class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunction<Point> = fixedCostPath) : Graph<Point>() {
 
     private val unitPoints = listOf(
@@ -70,6 +101,11 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
         }
     }
 
+    /**
+     * Print grid
+     *
+     * @param path
+     */
     fun printGrid(path: Collection<Node<Point>> = emptyList()){
         println()
         for (x in 0 until xRange){
@@ -89,8 +125,9 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
     private fun inBounds(pn: Point): Boolean =  pn.x in 0 until xRange &&  pn.y in 0 until yRange
 
 }
+
 /**
- * Graph of node of T (Undirected)
+ * Graph
  *
  * @param T
  * @constructor Create empty Graph
@@ -101,21 +138,44 @@ open class Graph<T> {
     private val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
 
 
-        fun costToGo(from: Node<T>, to: Node<T>): Double{
+    /**
+     * Cost to go
+     *
+     * @param from
+     * @param to
+     * @return
+     */
+    fun costToGo(from: Node<T>, to: Node<T>): Double{
         return  edges[from]!!.filter { it.node == to }[0].weightToParent
 
     }
 
+    /**
+     * Add edge
+     *
+     * @param from
+     * @param to
+     * @param costFromTo
+     */
     fun addEdge(from: Node<T>, to: Node<T>, costFromTo: Double = 1.0){
 
         insertEdge(from, to, costFromTo)
-        //This is an undirected graph. So be explicit in that there's also and edge to-from with the same cost.
+        //This is an undirected graph. So be explicit in that there's also an edge to-from with the same cost.
         //A directed graph would override addEdge.
         insertEdge(to, from, costFromTo)
     }
+
+    /**
+     * Add edge
+     *
+     * @param from
+     * @param to
+     * @param costFromTo
+     */
     fun addEdge(from: T, to: T, costFromTo: Double = 1.0){
         addEdge(Node(from), Node(to), costFromTo)
     }
+
     private fun insertEdge(from: Node<T>, to: Node<T>, costFromTo: Double) {
         when (edges.contains(from)) {
             true -> edges[from]!!.add(WeightedEdge(to, costFromTo) )
@@ -134,6 +194,13 @@ open class Graph<T> {
     fun nodes() : Collection<Node<T>> {
       return (edges.keys union edges.values.flatten().map { it.node }) //sets will remove duplicates.
     }
+
+    /**
+     * Edges for
+     *
+     * @param n
+     * @return
+     */
     fun edgesFor(n: Node<T>): Collection<WeightedEdge<T>>{
 
         if(edges.containsKey(n)){

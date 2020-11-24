@@ -16,18 +16,59 @@ val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node
     return 1.0
 }
 
-fun <T> aStar(g: Graph<T>, start: T, goal: T,  costFunc: (T, T) -> Double): Collection<Node<T>>  {
+/**
+ * A star
+ *
+ * @param T
+ * @param g
+ * @param start
+ * @param goal
+ * @param costFunc
+ * @receiver
+ * @return
+ */
+fun <T> aStar(g: Graph<T>, start: T, goal: T, costFunc: (T, T) -> Double): Collection<Node<T>>  {
     val nodeCostFunc = fun (n1: Node<T>, n2: Node<T>):Double = costFunc(n1.id, n2.id)
     return aStar(g, Node(start), Node(goal), nodeCostFunc)
 }
+
+/**
+ * Dijkstra
+ *
+ * @param T
+ * @param g
+ * @param start
+ * @param goal
+ * @return
+ */
 fun <T> dijkstra (g: Graph<T>, start: T, goal: T): Collection<Node<T>> {
     return dijkstra(g , Node(start), Node(goal))
 }
 
+/**
+ * Dijkstra
+ *
+ * @param T
+ * @param g
+ * @param start
+ * @param goal
+ * @return
+ */
 fun <T> dijkstra (g: Graph<T>, start: Node<T>, goal: Node<T>): Collection<Node<T>> {
     val zeroHeuristic = fun(_: Node<T>, _: Node<T>): Double = 0.0
     return aStar(g, start, goal, zeroHeuristic)
 }
+
+/**
+ * A star
+ *
+ * @param T
+ * @param g
+ * @param start
+ * @param goal
+ * @param f
+ * @return
+ */
 fun <T> aStar(g: Graph<T>, start: Node<T>, goal: Node<T>, f: Heuristic<T>): Collection<Node<T>>{
 
 

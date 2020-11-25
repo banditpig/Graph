@@ -1,5 +1,6 @@
 import java.util.*
 import kotlin.math.abs
+import java.util.Queue as Queue
 
 typealias Heuristic<T> = (Node<T>, Node<T>) -> Double
 typealias PathCostFunction<T> = (Node<T>, Node<T>) -> Double
@@ -15,7 +16,33 @@ val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node
     }
     return 1.0
 }
+fun <T> depthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
+    fun dfs(node: Node<T>, visited: MutableSet<Node<T>>){
+        nodeFunc(node.id)
+        visited.add(node)
+        g.neighbours(node)
+                .filter { !visited.contains(it) }
+                .map { dfs(it, visited) }
+    }
+    dfs(node, mutableSetOf<Node<T>>())
+}
+fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
+    fun bfs(q: Queue<Node<T>>, visited: MutableSet<Node<T>>){
+        if (q.isEmpty())  return
 
+        val node = q.remove()
+        nodeFunc(node.id)
+        g.neighbours(node)
+                .filter { !visited.contains(it)}
+                .map { q.add(it)
+                       visited.add(it) }
+        bfs(q, visited)
+
+    }
+
+    var q = LinkedList<Node<T>>().apply { add(node) }
+    bfs(q, mutableSetOf<Node<T>>().apply { add(node) })
+}
 /**
  * A star
  *
@@ -117,3 +144,4 @@ fun <T> aStar(g: Graph<T>, start: Node<T>, goal: Node<T>, f: Heuristic<T>): Coll
     return emptyList()
 
 }
+

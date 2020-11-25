@@ -35,8 +35,8 @@ fun makeTriple(three: List<String>):Triple<String, String, String>{
  * @param line
  * @return list of triples
  */
-fun processLine(line: String):List<Triple<String, String, String>>{
-   return line.split(",").chunked(3).map {makeTriple(it)  }
+fun processLine(line: String):List<Triple<String, String, String>> =
+    line.split(",").chunked(3).map {makeTriple(it)
 }
 
 /**
@@ -45,10 +45,9 @@ fun processLine(line: String):List<Triple<String, String, String>>{
  * @param allLines
  * @return
  */
-fun processForAllLines(allLines: String):List<List<Triple<String, String, String>>>{
-   return allLines.split("*")
-            .map {processLine(it)  }
-}
+fun processForAllLines(allLines: String):List<List<Triple<String, String, String>>> =
+    allLines.split("*").map {processLine(it)  }
+
 
 /**
  * Graph from string
@@ -102,11 +101,8 @@ fun <T> outputDot(g: Graph<T>, path: Collection<Node<T>> = emptyList(), fName: S
 
             return sb.append("\n")
         }
-
         g.nodes().fold(initial = sb, operation = { acc, node -> nodeFunc(acc, node)})
-
     }
-
 
     fun buildEdges(sb: StringBuilder) {
         g.nodes().forEach { n ->
@@ -122,20 +118,16 @@ fun <T> outputDot(g: Graph<T>, path: Collection<Node<T>> = emptyList(), fName: S
                     } else {
                         str.append(" [label = $label];")
                     }
-
                     str.append("\n")
                     doneEdges.add(edgeStr)
                     doneEdges.add(edgeStrRev)
                 }
                 return str
             }
-
             g.edgesFor(n).fold(sb, { acc, c -> doEdge(acc, c)})
         }
         sb.append("}")
     }
-
-
     buildNodes(dot)
     buildEdges(dot)
 

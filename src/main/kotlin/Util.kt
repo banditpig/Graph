@@ -1,25 +1,6 @@
 import java.io.File
 
 /**
- * Maybe
- *
- * @param T
- * @constructor Create empty Maybe
- */
-sealed class Maybe<out T> {
-    object None : Maybe<Nothing>()
-
-    /**
-     * Just
-     *
-     * @param T
-     * @property value
-     * @constructor Create empty Just
-     */
-    data class Just<T>(val value: T) : Maybe<T>()
-}
-
-/**
  * Make triple
  *
  * @param three
@@ -89,8 +70,8 @@ fun graphFromString(str: String):Graph<String>{
 fun <T> outputDot(g: Graph<T>, path: Collection<Node<T>> = emptyList(), fName: String = "graph.dot") {
 
     val gName = "G"
-    var doneEdges = mutableSetOf<String>()
-    var dot = StringBuilder("graph $gName {").append("\n")
+    val doneEdges = mutableSetOf<String>()
+    val dot = StringBuilder("graph $gName {").append("\n")
 
     fun buildNodes(sb: StringBuilder) {
         fun nodeFunc(sb: StringBuilder, n: Node<T>):StringBuilder{

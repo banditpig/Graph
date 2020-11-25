@@ -23,7 +23,7 @@ internal class UtilKtTest {
     fun processAllLines() {
 
         //to check that we get the correct number of correct triples
-        val str = "a,1.0,,b,1.0,1,c,1.0,2.0,d,1.0,3/" +
+        val str = "a,1.0,,b,1.0,1,c,1.0,2.0,d,1.0,3*" +
                 "f,1.0,,g,1.0,1,h,1.0,2.0,i,1.0,3"
 
         val res = processForAllLines(str)

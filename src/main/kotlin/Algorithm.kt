@@ -24,15 +24,16 @@ fun <T> depthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
                 .filter { !visited.contains(it) }
                 .map { dfs(it, visited) }
     }
-    dfs(node, mutableSetOf<Node<T>>())
+    dfs(node, mutableSetOf())
 }
 fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
+
     fun bfs(q: Queue<Node<T>>, visited: MutableSet<Node<T>>){
         if (q.isEmpty())  return
 
-        val node = q.remove()
-        nodeFunc(node.id)
-        g.neighbours(node)
+        val nd = q.remove()
+        nodeFunc(nd.id)
+        g.neighbours(nd)
                 .filter { !visited.contains(it)}
                 .map { q.add(it)
                        visited.add(it) }
@@ -40,7 +41,7 @@ fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit)
 
     }
 
-    var q = LinkedList<Node<T>>().apply { add(node) }
+    val q = LinkedList<Node<T>>().apply { add(node) }
     bfs(q, mutableSetOf<Node<T>>().apply { add(node) })
 }
 /**

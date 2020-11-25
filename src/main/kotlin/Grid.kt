@@ -19,12 +19,9 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
             (0 until yRange).forEach { y ->
                 val p = Point(x, y)
 
-                for(unitP in unitPoints){
-                    val neigh = Point(x, y) + unitP
-                    if(inBounds(neigh)){
-                        addEdge(Node(p), Node(neigh), f(Node(p), Node(neigh)))
-                    }
-                }
+                unitPoints.map { p + it }
+                          .filter { inBounds(it) }
+                          .forEach { addEdge(Node(p), Node(it), f(Node(p), Node(it))) }
             }
         }
     }
@@ -36,15 +33,20 @@ class RectGrid(private val xRange: Int, private val yRange: Int, f: PathCostFunc
      */
     fun printGrid(path: Collection<Node<Point>> = emptyList()){
         println()
-        for (x in 0 until xRange){
-            for(y in 0 until yRange){
-                val pn = Node(Point(x, y))
-                if (path.contains(pn)){
-                    print(".")
-                }else {
-                    print("#")
-                }
+        fun decideWhichCharPrint(it: Node<Point>) {
+            if (path.contains(it)) {
+                print(".")
+            } else {
+                print("#")
             }
+        }
+
+        (0 until xRange).forEach { x ->
+            (0 until yRange)
+                    .map { Node(Point(x, it)) }
+                    .forEach {
+                        decideWhichCharPrint(it)
+                    }
             println()
         }
         println()

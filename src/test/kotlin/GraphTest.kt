@@ -216,11 +216,15 @@ internal class GraphTest {
         g.addEdge(7, 12)
 
 
-        val p =  fun (s: Int)= println(s)
-        breadthFirstTraversal(Node(1), g, p)
-        println("--------")
-        depthFirstTraversal(Node(1), g, p)
-        outputDot(g)
+        var l = mutableListOf<Int>()
+        //val p =  fun (s: Int)= println(s)
+        val a = fun (s: Int) {
+            l.add(s)
+            return
+        }
+        breadthFirstTraversal(Node(1), g, a)
+        l.map { println(it) }
+        TODO("Need asserts on accumulated list")
     }
     @Test
     fun dfs(){
@@ -232,8 +236,14 @@ internal class GraphTest {
         g.addEdge(2, 3);
         g.addEdge(3, 3);
 
-        val p =  fun (s: Int)= println(s)
-        depthFirstTraversal(Node<Int>(2), g, p)
+        var l = mutableListOf<Int>()
+        //val p =  fun (s: Int)= println(s)
+        val a = fun (s: Int) {
+            l.add(s)
+            return
+        }
+        depthFirstTraversal(Node<Int>(2), g, a)
+        TODO("Need asserts on accumulated list")
     }
 
 }

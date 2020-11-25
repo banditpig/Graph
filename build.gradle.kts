@@ -20,3 +20,7 @@ tasks.withType<KotlinCompile>() {
 tasks.test {
     useJUnitPlatform()
 }
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    languageVersion = "1.4"
+}

@@ -16,23 +16,48 @@ val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node
     }
     return 1.0
 }
+
+/**
+ * Depth first traversal
+ *
+ * @param T
+ * @param node
+ * @param g
+ * @param nodeFunc
+ * @receiver
+ */
 fun <T> depthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
-    fun dfs(node: Node<T>, visited: MutableSet<Node<T>>){
+
+    tailrec fun dfs(node: Node<T>, visited: MutableSet<Node<T>>){
         nodeFunc(node.id)
         visited.add(node)
         g.neighbours(node)
-                .filter { !visited.contains(it) }
-                .map { dfs(it, visited) }
+                .filter { !visited.contains(it)  }
+
+                .map {  ; dfs(it, visited) }
     }
     dfs(node, mutableSetOf())
 }
-fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
 
-    fun bfs(q: Queue<Node<T>>, visited: MutableSet<Node<T>>){
+/**
+ * Breadth first traversal
+ *
+ * @param T
+ * @param node
+ * @param g
+ * @param nodeFunc
+ * @receiver
+ */
+fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>,
+                              nodeFunc: (T) -> Unit){
+
+
+    tailrec fun bfs(q: Queue<Node<T>>, visited: MutableSet<Node<T>>){
         if (q.isEmpty())  return
 
         val nd = q.remove()
         nodeFunc(nd.id)
+
         g.neighbours(nd)
                 .filter { !visited.contains(it)}
                 .map { q.add(it)
@@ -44,6 +69,7 @@ fun <T> breadthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit)
     val q = LinkedList<Node<T>>().apply { add(node) }
     bfs(q, mutableSetOf<Node<T>>().apply { add(node) })
 }
+
 /**
  * A star
  *

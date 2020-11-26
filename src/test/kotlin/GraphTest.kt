@@ -201,6 +201,40 @@ internal class GraphTest {
         println(pd)
     }
     @Test
+    fun dfs(){
+        val g = Graph<Int>()
+        g.addEdge(1, 2)
+        g.addEdge(1, 7)
+        g.addEdge(1, 8)
+        g.addEdge(2, 3)
+        g.addEdge(2, 6)
+        g.addEdge(3, 4)
+        g.addEdge(3, 5)
+        g.addEdge(8, 9)
+        g.addEdge(8, 12)
+        g.addEdge(9, 10)
+        g.addEdge(9, 11)
+
+
+        var l = mutableListOf<Int>()
+        //val p =  fun (s: Int)= println(s)
+        val a = fun (s: Int) {
+            l.add(s)
+            println(s)
+            return
+        }
+        depthFirstTraversal(Node(1), g, a)
+        //all nodes visted
+        assertEquals(12, l.size)
+        l.mapIndexed { ix, it ->
+            {
+                assertEquals(ix + 1, it)
+            }
+        }
+
+        outputDot(g, emptyList(), "dfs.dot")
+    }
+    @Test
     fun bfs(){
         val g = Graph<Int>()
         g.addEdge(1, 2)
@@ -214,36 +248,22 @@ internal class GraphTest {
         g.addEdge(4, 8)
         g.addEdge(7, 11)
         g.addEdge(7, 12)
-
-
         var l = mutableListOf<Int>()
         //val p =  fun (s: Int)= println(s)
         val a = fun (s: Int) {
             l.add(s)
+            println(s)
             return
         }
-        breadthFirstTraversal(Node(1), g, a)
-        l.map { println(it) }
-        TODO("Need asserts on accumulated list")
-    }
-    @Test
-    fun dfs(){
-        val g = Graph<Int>()
-        g.addEdge(0, 1);
-        g.addEdge(0, 2);
-        g.addEdge(1, 2);
-        g.addEdge(2, 0);
-        g.addEdge(2, 3);
-        g.addEdge(3, 3);
-
-        var l = mutableListOf<Int>()
-        //val p =  fun (s: Int)= println(s)
-        val a = fun (s: Int) {
-            l.add(s)
-            return
+        breadthFirstTraversal(Node<Int>(1), g, a)
+        //all nodes visted and order ok
+        assertEquals(12, l.size)
+        l.mapIndexed { ix, it ->
+            {
+                assertEquals(ix + 1, it)
+            }
         }
-        depthFirstTraversal(Node<Int>(2), g, a)
-        TODO("Need asserts on accumulated list")
+        outputDot(g, emptyList(), "bfs.dot")
     }
 
 }

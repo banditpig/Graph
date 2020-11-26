@@ -146,14 +146,12 @@ open class Graph<T> {
      * @param n
      * @return
      */
-    fun edgesFor(n: Node<T>): Collection<WeightedEdge<T>>{
+    fun edgesFor(n: Node<T>): Collection<WeightedEdge<T>> =
+         edges.filterKeys { it == n }
+            .map { kv -> kv.value }
+            .flatten()
 
-        if(edges.containsKey(n)){
-          return Collections.unmodifiableCollection( edges[n]!!)
-        }
-       return emptyList()
 
-    }
 
     /**
      * Adjacent
@@ -163,9 +161,7 @@ open class Graph<T> {
      * @return
      */
     open fun adjacent(n1: Node<T>, n2: Node<T>): Boolean{
-        return edges.containsKey(n1) && edges[n1]!!.map { it.node }.contains(n2)
-                ||
-               edges.containsKey(n2) && edges[n2]!!.map { it.node }.contains(n1)
+       return neighbours(n1).contains(n2) ||  neighbours(n2).contains(n1)
     }
 
     /**
@@ -174,12 +170,11 @@ open class Graph<T> {
      * @param n
      * @return
      */
-    fun neighbours(n: Node<T> ): Collection<Node<T>>{
-
-        if(edges.containsKey(n)) {
-            val nodes = edges[n]!!.toList().map { it.node }
-            return Collections.unmodifiableList(nodes)
-        }
-        return emptyList()
+    fun neighbours(n: Node<T> ): Collection<Node<T>> {
+       return edges.filterKeys { it == n }
+            .map { kv -> kv.value }
+            .flatten()
+            .map { it.node }
     }
+
 }

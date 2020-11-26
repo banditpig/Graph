@@ -4,7 +4,7 @@
  * @param T
  * @constructor Create empty Di graph
  */
-class DiGraph<T> : Graph<T>() {
+open class DiGraph<T> : Graph<T>() {
 
     override fun addEdge(from: Node<T>, to: Node<T>, costFromTo: Double){
 

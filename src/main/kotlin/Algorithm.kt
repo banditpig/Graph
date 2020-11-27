@@ -28,7 +28,7 @@ val penaliseDiagonal : PathCostFunction<Point> =  fun(frm: Node<Point>, to: Node
  */
 fun <T> depthFirstTraversal(node: Node<T>, g: Graph<T>, nodeFunc: (T) -> Unit){
 
-    tailrec fun dfs(node: Node<T>, visited: MutableSet<Node<T>>){
+    fun dfs(node: Node<T>, visited: MutableSet<Node<T>>){
         nodeFunc(node.id)
         visited.add(node)
         g.neighbours(node)

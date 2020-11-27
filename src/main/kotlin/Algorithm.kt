@@ -114,7 +114,7 @@ fun <T> dijkstra (g: Graph<T>, start: Node<T>, goal: Node<T>): Collection<Node<T
 }
 
 /**
- * A star
+ * Astar
  *
  * @param T
  * @param g
@@ -146,8 +146,8 @@ fun <T> aStar(g: Graph<T>, start: Node<T>, goal: Node<T>, f: Heuristic<T>): Coll
                 unpick(acc, cameFrom.remove(n)!!)
             }
             val path =  mutableListOf(goal)
-            val nd = cameFrom.remove(goal)
-            unpick(path, nd!!)
+
+            unpick(path,cameFrom.remove(goal)!! )
             return path.reversed()
         }
 

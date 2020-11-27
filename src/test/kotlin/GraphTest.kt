@@ -3,7 +3,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import kotlin.test.asserter
 
 internal class GraphTest {
 
@@ -264,6 +263,32 @@ internal class GraphTest {
             }
         }
         outputDot(g, emptyList(), "bfs.dot")
+    }
+
+    @Test
+    fun map(){
+        //take graph of ints and map into graph of string
+        val g = Graph<Int>()
+        g.addEdge(1, 2)
+        g.addEdge(1, 3)
+        g.addEdge(1, 4)
+        g.addEdge(2, 5)
+        g.addEdge(2, 6)
+        
+        g.map { it.toString() }.nodes().map { it -> assertTrue(it.id is String) }
+
+
+
+        //map of ints and add 99 to each
+        val g3 = Graph<Int>()
+        g3.addEdge(1, 2)
+        g3.addEdge(1, 3)
+        g3.addEdge(1, 4)
+        g3.addEdge(2, 5)
+        g3.addEdge(2, 6)
+
+        g3.map{ it + 1 }
+
     }
 
 }

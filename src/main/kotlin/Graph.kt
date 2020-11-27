@@ -77,12 +77,15 @@ data class WeightedEdge<T>(val node: Node<T>, val weightToParent: Double)
  * @param T
  * @constructor Create empty Graph
  */
-open class Graph<T> {
+open class Graph<T>{
 
 
-    val edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
+    protected var edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> = hashMapOf()
+    constructor()
 
-
+    private constructor(edges: HashMap<Node<T>, MutableCollection<WeightedEdge<T>>> ){
+    this.edges = edges
+    }
     /**
      * Cost to go
      *
@@ -176,5 +179,20 @@ open class Graph<T> {
             .flatten()
             .map { it.node }
     }
+
+    fun <R> map(tr: (T) -> R): Graph<R>{
+
+        val ks = edges.keys.map { Node(tr(it.id)) }
+
+        val vs: List<List<WeightedEdge<R>>> = edges.values
+                .map { l -> l.map { WeightedEdge(Node(tr(it.node.id)),it.weightToParent) }}
+
+        val edgesR:  HashMap<Node<R>, MutableCollection<WeightedEdge<R>>> = hashMapOf()
+        ks.forEachIndexed { index, node -> edgesR[node] = vs[index].toMutableList()  }
+        return Graph(edgesR)
+    }
+
+
+
 
 }

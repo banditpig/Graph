@@ -33,7 +33,44 @@ internal class TreeTest {
         assertTrue(t.children(3).size == 1)
         (10..10).map { assertTrue(t.children(3).map { it -> it.id }.contains(it)) }
 
-        outputDot(t, emptyList(), "tree.dot")
+       // outputDot(t, emptyList(), "tree.dot")
+
+    }
+
+    @Test
+    fun parents(){
+        val root = 0
+        val t = Tree<Int>(root)
+        assertTrue(t.inDegree(root) == 0)
+        assertTrue(t.outDegree(root) == 0)
+
+
+        t.addChildTo(root, 1)
+        t.addChildTo(root, 2)
+        t.addChildTo(root, 3)
+        assertTrue(t.outDegree(root) == 3)
+        assertTrue(t.inDegree(3) == 1)
+        assertTrue(t.inDegree(2) == 1)
+        assertTrue(t.inDegree(1) == 1)
+
+
+
+        t.addChildTo(1, 4)
+        t.addChildTo(1, 5)
+        assertTrue(t.outDegree(1) == 2)
+        assertTrue(t.outDegree(4) == 0)
+        assertTrue(t.outDegree(5) == 0)
+
+        assertTrue(!t.isLeaf(1)) //not a leaf
+        assertTrue(t.isLeaf(4) )
+        assertTrue(t.isLeaf(5) )
+
+        t.addChildTo(11, 4)
+        assertTrue(t.inDegree(4) == 2)
+
+        t.addChildTo(12, 4)
+        assertTrue(t.inDegree(4) == 3)
+
 
     }
 }

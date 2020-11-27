@@ -290,5 +290,23 @@ internal class GraphTest {
         g3.map{ it + 1 }
 
     }
+    @Test
+    fun fold(){
+        val g = Graph<Int>()
+        g.addEdge(1, 2)
+        g.addEdge(1, 3)
+        g.addEdge(1, 4)
+        g.addEdge(2, 5)
+        g.addEdge(2, 6)
+
+        val sum = g.fold(0, {a, x -> a + x})
+        assertTrue(sum == 21 )
+
+        val list = mutableListOf<Int>()
+
+        g.fold(list, {a, x -> a.add(x); a})
+        assertTrue(list.size == 6)
+        (1..6).map { assertTrue(list.contains(it)) }
+    }
 
 }

@@ -37,5 +37,18 @@ open class DiGraph<T> : Graph<T>(){
     fun canTraverse(from: Node<T>, to: Node<T>): Boolean =
         edges.containsKey(from) && edges[from]!!.map { it.node }.contains(to)
 
+    fun inDegree(n: Node<T>):Int = inNodes(n).size
+    fun inDegree(t: T):Int = inNodes(Node(t)).size
+    fun outDegree(n: Node<T>):Int = outNodes(n).size
+    fun outDegree(t: T):Int = outNodes(Node(t)).size
+    fun inNodes(n: Node<T>): Collection<Node<T>>{
+        return  edges.filter { kv -> kv.value.map{it.node}
+                .contains(n) }
+                .map{it.key}
+    }
+    fun outNodes(parent: Node<T>): Collection<Node<T>> =
+            neighbours(parent)
+
+
 
 }

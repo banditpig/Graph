@@ -48,5 +48,29 @@ internal class DiGraphTest {
         assertFalse(g.canTraverse(n2, n3))
 
     }
+    @Test
+    fun more_inout(){
+        val g = DiGraph<String>()
+        g.addEdge("02","22")
+        g.addEdge("02","20")
+        g.addEdge("22","20")
+        g.addEdge("22","11")
+        g.addEdge("11","22")
 
+        assertTrue(g.inDegree("02") == 0)
+        assertTrue(g.outDegree("02") == 2)
+
+        assertTrue(g.inDegree("22") == 2)
+        assertTrue(g.outDegree("22") == 2)
+
+        assertTrue(g.inDegree("20") == 2)
+        assertTrue(g.outDegree("20") == 0)
+
+        assertTrue(g.inDegree("11") == 1)
+        assertTrue(g.outDegree("11") == 1)
+
+
+
+
+    }
 }

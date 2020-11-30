@@ -182,14 +182,13 @@ open class Graph<T>{
     fun <R> map(tr: (T) -> R): Graph<R>{
 
         val ks = edges.keys.map { Node(tr(it.id)) }
-
-        val vs: List<List<WeightedEdge<R>>> = edges.values
+        val vs = edges.values
                 .map { l -> l.map { WeightedEdge(Node(tr(it.node.id)),it.weightToParent) }}
         val edgesR:  HashMap<Node<R>, MutableCollection<WeightedEdge<R>>> = hashMapOf()
         ks.forEachIndexed { index, node -> edgesR[node] = vs[index].toMutableList()  }
         return Graph(edgesR)
     }
-    fun <R> fold(initial: R, op: (acc: R, T) -> R): R {
+    fun  <R> fold(initial: R, op: (acc: R, T) -> R): R {
         val op1 = fun (acc: R, nd: Node<T>) = op(acc, nd.id)
         return nodes().fold(initial, op1)
     }
